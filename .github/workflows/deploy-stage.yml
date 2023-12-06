@@ -1,0 +1,51 @@
+name: deploy-stage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4.1.1
+      - uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.12'
+
+      - name: deploy
+        uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
+        env:
+          TARGET_DIR: /home/${{ secrets.SSH_USERNAME_STAGE }}
+          VENV_BIN: venv/bin
+        with:
+          host: ${{ secrets.SSH_HOST_STAGE }}
+          user: ${{ secrets.SSH_USERNAME_STAGE }}
+          pass: ${{ secrets.SSH_PASSWORD_STAGE }}
+          port: 22
+          connect_timeout: 10s
+          first_ssh: |-
+            mkdir -p ticket_scrappers
+            mkdir -p logs
+            test -d venv || python3.12 -m venv venv
+            touch .env
+
+          scp: |-
+            './etc/*' => $TARGET_DIR/etc/
+            './telegram_publisher/*' => $TARGET_DIR/telegram_publisher/
+            ./poetry.lock => $TARGET_DIR
+            ./pyproject.toml => $TARGET_DIR
+
+          last_ssh: |-
+            $VENV_BIN/pip install --no-cache-dir poetry pip setuptools --upgrade
+            $VENV_BIN/poetry config virtualenvs.create false --local
+            $VENV_BIN/poetry install --only main
+            $VENV_BIN/pip cache purge
+            echo 'DATABASE_USER=${{ secrets.DATABASE_USER_STAGE }}' > .env
+            echo 'DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD_STAGE }}' >> .env
+            echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME_STAGE }}' >> .env
+            echo 'DATABASE_HOST=${{ secrets.DATABASE_HOST_STAGE }}' >> .env
+            echo 'DATABASE_PORT=${{ secrets.DATABASE_PORT_STAGE }}' >> .env
+            crontab etc/crontab_staging.txt

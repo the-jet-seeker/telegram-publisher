@@ -1,0 +1,1 @@
+"""Telegram trips publisher app."""

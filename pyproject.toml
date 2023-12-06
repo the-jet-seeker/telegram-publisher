@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "telegram-publisher"
+version = "0.1.0"
+description = ""
+authors = ["Simon <spam@esemi.ru>"]
+license = "GNU GENERAL PUBLIC LICENSE V3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic-settings = "^2.1.0"
+pony = "^0.7.17"
+psycopg2 = "^2.9.9"
+aiogram = "^3.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.23.2"
+pony-stubs = "^0.5.2"
+pytest = "^7.4.3"
+wemake-python-styleguide = "^0.18.0"
+mypy = "^1.7.1"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

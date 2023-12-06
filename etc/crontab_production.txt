@@ -1,0 +1,3 @@
+# publish post to telegram post on Monday 10:00 CET
+0 9 * * * venv/bin/python -m telegram_publisher.publisher &>> logs/publisher.log
+

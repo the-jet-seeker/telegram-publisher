@@ -1,0 +1,28 @@
+[flake8]
+max-line-length = 125
+max-local-variables = 7
+
+ignore =
+    # Missing parameter(s) in Docstring
+    DAR101,
+
+    # Missing "Returns" in Docstring
+    DAR201,
+
+    # Missing exception(s) in Raises section
+    DAR401,
+
+    #  Found too long ``try`` body length
+    WPS229,
+
+    # F-strings is OK
+    WPS305,
+
+    # Found class without a base class - dataclass used
+    WPS306,
+
+
+per-file-ignores =
+    # WPS115 Found upper-case constant in a class
+    # WPS432 Found magic number
+    telegram_publisher/settings.py: WPS115, WPS432,
