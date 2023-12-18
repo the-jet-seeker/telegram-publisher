@@ -24,5 +24,8 @@ ignore =
 
 per-file-ignores =
     # WPS115 Found upper-case constant in a class
+    # WPS426 Found `lambda` in loop's body
     # WPS432 Found magic number
+
     telegram_publisher/settings.py: WPS115, WPS432,
+    telegram_publisher/trips_selector.py: WPS426,

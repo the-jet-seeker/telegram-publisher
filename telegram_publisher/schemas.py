@@ -2,8 +2,6 @@
 
 from dataclasses import dataclass
 
-import pendulum
-
 from telegram_publisher.models import Trip
 
 
@@ -28,4 +26,3 @@ class Trips:
     """Possible trips result schema."""
 
     groups: list[TripsGroup]
-    weekend_start_date_utc: pendulum.datetime
