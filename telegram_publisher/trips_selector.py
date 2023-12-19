@@ -5,9 +5,8 @@ import operator
 from decimal import Decimal
 
 import pendulum
-from pony.orm import db_session, select, sql_debugging, set_sql_debug
 
-from telegram_publisher.models import Trip
+from telegram_publisher.models import Session, Trip
 from telegram_publisher.schemas import Trips, TripsGroup
 from telegram_publisher.settings import app_settings
 
@@ -23,7 +22,7 @@ def get_weekend_range_in_local_tz() -> tuple[pendulum.DateTime, pendulum.DateTim
     weekend_end_date = weekend_start_date.next(day_of_week=pendulum.MONDAY).set(
         hour=app_settings.MAXIMUM_RETURN_FLY_HOUR,
     )
-    return weekend_start_date, weekend_end_date
+    return weekend_start_date.naive(), weekend_end_date.naive()
 
 
 def get_top_trips(top_n: int) -> Trips:
@@ -36,7 +35,7 @@ def get_top_trips(top_n: int) -> Trips:
     # sort by total cost and limiting
     top_by_cost = sorted(
         trips,
-        key=lambda trip: trip['outbound_cost'] + trip['return_cost'],
+        key=lambda trip: trip.outbound_cost + trip.return_cost,
     )[:top_n]
     logger.info('top trips by cost {0}'.format(len(top_by_cost)))
 
@@ -46,18 +45,18 @@ def get_top_trips(top_n: int) -> Trips:
 
 
 def _group_by_destination(top_by_cost: list[Trip]) -> list[TripsGroup]:
-    key_function = operator.itemgetter('return_airport')
+    key_function = operator.attrgetter('return_airport')
     sorted_by_destination = sorted(top_by_cost, key=key_function)
 
     unsorted_groups: list[tuple[Decimal, TripsGroup]] = []
     for destination_code, group in itertools.groupby(sorted_by_destination, key=key_function):
         group_trips = sorted(
             group,
-            key=lambda trip: trip['outbound_cost'] + trip['return_cost'],
+            key=lambda trip: trip.outbound_cost + trip.return_cost,
         )
         unsorted_groups.append(
             (
-                group_trips[0]['outbound_cost'] + group_trips[0]['return_cost'],
+                group_trips[0].outbound_cost + group_trips[0].return_cost,
                 TripsGroup(
                     destination_code=destination_code,
                     trips=group_trips,
@@ -76,14 +75,14 @@ def _fetch_trips(
     datetime_from: pendulum.DateTime,
     datetime_to: pendulum.DateTime,
 ) -> list[Trip]:
-    with db_session:
-        query = Trip.select().filter(lambda x: x.outbound_airport == 'PRG')
-
-    # query = select(
-    #     trip for trip in Trip
-    #     # if trip.outbound_airport == outbound_airport_code
-    #     # and trip.start_date >= datetime_from
-    #     # and trip.end_date <= datetime_to
-    # )
-        return list(query)
-
+    with Session() as session:
+        query = (
+            Trip.select().where(
+                Trip.outbound_airport == outbound_airport_code,
+            ).where(
+                Trip.start_date >= datetime_from,
+            ).where(
+                Trip.end_date <= datetime_to,
+            )
+        )
+        return session.scalars(query).all()  # type: ignore

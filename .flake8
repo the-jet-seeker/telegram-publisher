@@ -28,4 +28,5 @@ per-file-ignores =
     # WPS432 Found magic number
 
     telegram_publisher/settings.py: WPS115, WPS432,
+    telegram_publisher/models.py: WPS432,
     telegram_publisher/trips_selector.py: WPS426,

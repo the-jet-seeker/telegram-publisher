@@ -2,39 +2,52 @@
 from datetime import datetime
 from decimal import Decimal
 
-import pendulum
-from pony.orm import Database, PrimaryKey, Required
+import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import NUMERIC, TIMESTAMP
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
 from telegram_publisher.settings import app_settings
 
-db = Database()
+
+class Base(DeclarativeBase):
+    """Base class for every database model."""
+
+    @classmethod
+    def select(cls) -> sa.Select:
+        """Select query shortcut."""
+        return sa.select(cls)
 
 
-class Trip(db.Entity):  # type: ignore
-    """Trip table model."""
+class Trip(Base):
+    """Trip database table model."""
 
-    id = PrimaryKey(int, auto=True)
-    start_date = Required(pendulum.DateTime, index=True)  # local home airport time
-    end_date = Required(pendulum.DateTime, index=True)  # local home airport time
-    currency = Required(str)
+    __tablename__ = 'trip'
 
-    outbound_cost = Required(Decimal, precision=2)
-    outbound_airport = Required(str)
-    outbound_airline = Required(str)
-    outbound_fly_number = Required(str)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    start_date: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), index=True)
+    end_date: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), index=True)
+    currency: Mapped[str] = mapped_column(sa.String(length=3))
 
-    return_cost = Required(Decimal, precision=2)
-    return_airport = Required(str)
-    return_airline = Required(str)
-    return_fly_number = Required(str)
+    outbound_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=2, scale=20))
+    outbound_airport: Mapped[str] = mapped_column(sa.String(length=3), index=True)
+    outbound_airline: Mapped[str] = mapped_column(sa.String)
+    outbound_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
+
+    return_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=2, scale=20))
+    return_airport: Mapped[str] = mapped_column(sa.String(length=3))
+    return_airline: Mapped[str] = mapped_column(sa.String)
+    return_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
 
 
-db.bind(
-    provider='postgres',
-    user=app_settings.DATABASE_USER,
-    password=app_settings.DATABASE_PASSWORD,
-    host=app_settings.DATABASE_HOST,
-    database=app_settings.DATABASE_NAME,
-    port=app_settings.DATABASE_PORT,
+engine = sa.create_engine(
+    url='postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}'.format(
+        app_settings.DATABASE_USER,
+        app_settings.DATABASE_PASSWORD,
+        app_settings.DATABASE_HOST,
+        app_settings.DATABASE_PORT,
+        app_settings.DATABASE_NAME,
+    ),
+    echo=app_settings.DEBUG,
 )
-db.generate_mapping()
+
+Session = sessionmaker(engine)

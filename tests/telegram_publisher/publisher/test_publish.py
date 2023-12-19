@@ -1,13 +1,12 @@
-from unittest.mock import Mock
-
+from telegram_publisher.models import Trip
 from telegram_publisher.publisher import _publish
 from telegram_publisher.schemas import TripsGroup
 
 
-async def test_publish_smoke():
+async def test_publish_smoke(trip_first: Trip, trip_second: Trip):
     trips_group = TripsGroup(
         destination_code='BCN',
-        trips=[Mock(id=0), Mock(id=1)],
+        trips=[trip_first, trip_second],
     )
 
     res = await _publish([trips_group], 'Publisher unittests')

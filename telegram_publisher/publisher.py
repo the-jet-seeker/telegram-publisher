@@ -3,6 +3,8 @@
 import asyncio
 import logging
 
+import airportsdata
+import pendulum
 from aiogram.utils import markdown
 
 from telegram_publisher.bot_setup import bot
@@ -11,6 +13,8 @@ from telegram_publisher.settings import app_settings
 from telegram_publisher.trips_selector import get_top_trips
 
 logger = logging.getLogger(__file__)
+
+airports = airportsdata.load('IATA')
 
 
 async def main() -> PublisherResponse:
@@ -42,9 +46,31 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     ]
 
     for trips_group in trips:
-        messages.append(markdown.bold(trips_group.destination_code))
+        destination: str = airports.get(
+            trips_group.destination_code,
+            {},
+        ).get(
+            'city',
+            trips_group.destination_code,
+        )
+        messages.append(markdown.bold('{0} ({1})'.format(
+            destination,
+            trips_group.destination_code,
+        )))
+
         for trip in trips_group.trips:
-            messages.append(markdown.markdown_decoration.quote(f'Trip id#{trip.id}'))
+            total_cost = trip.outbound_cost + trip.return_cost
+            messages.append(markdown.markdown_decoration.quote('{0} {1}'.format(
+                total_cost,
+                trip.currency,
+            )))
+            messages.append(markdown.markdown_decoration.quote(
+                pendulum.instance(trip.start_date).to_day_datetime_string(),
+            ))
+            messages.append(markdown.markdown_decoration.quote(
+                pendulum.instance(trip.end_date).to_day_datetime_string(),
+            ))
+            messages.append('')
             counter += 1
 
     message = markdown.text(*messages, sep='\n')
