@@ -5,7 +5,7 @@ import operator
 from decimal import Decimal
 
 import pendulum
-from pony.orm import db_session
+from pony.orm import db_session, select, sql_debugging, set_sql_debug
 
 from telegram_publisher.models import Trip
 from telegram_publisher.schemas import Trips, TripsGroup
@@ -71,12 +71,19 @@ def _group_by_destination(top_by_cost: list[Trip]) -> list[TripsGroup]:
     ]
 
 
-@db_session
 def _fetch_trips(
     outbound_airport_code: str,
     datetime_from: pendulum.DateTime,
     datetime_to: pendulum.DateTime,
 ) -> list[Trip]:
-    # todo impl
-    # todo test
-    return []
+    with db_session:
+        query = Trip.select().filter(lambda x: x.outbound_airport == 'PRG')
+
+    # query = select(
+    #     trip for trip in Trip
+    #     # if trip.outbound_airport == outbound_airport_code
+    #     # and trip.start_date >= datetime_from
+    #     # and trip.end_date <= datetime_to
+    # )
+        return list(query)
+

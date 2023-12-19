@@ -2,6 +2,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pendulum
 from pony.orm import Database, PrimaryKey, Required
 
 from telegram_publisher.settings import app_settings
@@ -13,16 +14,16 @@ class Trip(db.Entity):  # type: ignore
     """Trip table model."""
 
     id = PrimaryKey(int, auto=True)
-    start_date = Required(datetime)  # local home airport time
-    end_date = Required(datetime)  # local home airport time
+    start_date = Required(pendulum.DateTime, index=True)  # local home airport time
+    end_date = Required(pendulum.DateTime, index=True)  # local home airport time
     currency = Required(str)
 
-    outbound_cost = Required(Decimal)
+    outbound_cost = Required(Decimal, precision=2)
     outbound_airport = Required(str)
     outbound_airline = Required(str)
     outbound_fly_number = Required(str)
 
-    return_cost = Required(Decimal)
+    return_cost = Required(Decimal, precision=2)
     return_airport = Required(str)
     return_airline = Required(str)
     return_fly_number = Required(str)
