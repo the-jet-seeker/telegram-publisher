@@ -1,9 +1,9 @@
-name: deploy-stage
+name: deploy-production
 
 on:
   push:
     branches:
-      - main
+      - release
 
 jobs:
   on-success:
@@ -18,12 +18,12 @@ jobs:
       - name: deploy
         uses: cross-the-world/ssh-scp-ssh-pipelines@v1.1.4
         env:
-          TARGET_DIR: /home/${{ secrets.SSH_USERNAME_STAGE }}
+          TARGET_DIR: /home/${{ secrets.SSH_USERNAME_PRODUCTION }}
           VENV_BIN: venv/bin
         with:
-          host: ${{ secrets.SSH_HOST_STAGE }}
-          user: ${{ secrets.SSH_USERNAME_STAGE }}
-          pass: ${{ secrets.SSH_PASSWORD_STAGE }}
+          host: ${{ secrets.SSH_HOST_PRODUCTION }}
+          user: ${{ secrets.SSH_USERNAME_PRODUCTION }}
+          pass: ${{ secrets.SSH_PASSWORD_PRODUCTION }}
           port: 22
           connect_timeout: 10s
           first_ssh: |-
@@ -43,10 +43,11 @@ jobs:
             $VENV_BIN/poetry config virtualenvs.create false --local
             $VENV_BIN/poetry install --only main --no-root
             $VENV_BIN/pip cache purge
-            echo 'DATABASE_USER=${{ secrets.DATABASE_USER_STAGE }}' > .env
-            echo 'DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD_STAGE }}' >> .env
-            echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME_STAGE }}' >> .env
-            echo 'DATABASE_HOST=${{ secrets.DATABASE_HOST_STAGE }}' >> .env
-            echo 'DATABASE_PORT=${{ secrets.DATABASE_PORT_STAGE }}' >> .env
-            echo 'BOT_TOKEN=${{ secrets.BOT_TOKEN_STAGE }}' >> .env
-            crontab etc/crontab_staging.txt
+            echo 'DATABASE_USER=${{ secrets.DATABASE_USER_PRODUCTION }}' > .env
+            echo 'DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD_PRODUCTION }}' >> .env
+            echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME_PRODUCTION }}' >> .env
+            echo 'DATABASE_HOST=${{ secrets.DATABASE_HOST_PRODUCTION }}' >> .env
+            echo 'DATABASE_PORT=${{ secrets.DATABASE_PORT_PRODUCTION }}' >> .env
+            echo 'BOT_TOKEN=${{ secrets.BOT_TOKEN_PRODUCTION }}' >> .env
+            echo 'PUBLISH_CHANNEL_ID=${{ secrets.CHANNEL_ID_PRODUCTION }}' >> .env
+            crontab etc/crontab_production.txt

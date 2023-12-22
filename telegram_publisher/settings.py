@@ -1,9 +1,12 @@
 """Application settings."""
 import os
+from decimal import getcontext
 
 import pendulum
 from pydantic import Field
 from pydantic_settings import BaseSettings
+
+getcontext().prec = 2
 
 APP_PATH = os.path.abspath(
     os.path.join(

@@ -51,7 +51,7 @@ $ poetry run flake8 telegram_publisher/
 $ poetry run mypy telegram_publisher/
 ```
 
-### Run scrapper
+### Run publisher
 ```shell
 $ python -m telegram_publisher.publisher
 ```

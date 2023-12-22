@@ -28,12 +28,12 @@ class Trip(Base):
     end_date: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), index=True)
     currency: Mapped[str] = mapped_column(sa.String(length=3))
 
-    outbound_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=2, scale=20))
+    outbound_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2))
     outbound_airport: Mapped[str] = mapped_column(sa.String(length=3), index=True)
     outbound_airline: Mapped[str] = mapped_column(sa.String)
     outbound_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
 
-    return_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=2, scale=20))
+    return_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2))
     return_airport: Mapped[str] = mapped_column(sa.String(length=3))
     return_airline: Mapped[str] = mapped_column(sa.String)
     return_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
