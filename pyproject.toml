@@ -37,3 +37,7 @@ asyncio_mode = "auto"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+
+[tool.isort]
+line_length = 125
+profile = "black"

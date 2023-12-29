@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+import pendulum
+
 from telegram_publisher.models import Trip
 
 
@@ -10,6 +12,7 @@ class PublisherResponse:
     """Task response schema."""
 
     is_success: bool
+    date_range: tuple[pendulum.DateTime, pendulum.DateTime]
     trips_published: int = 0
 
 

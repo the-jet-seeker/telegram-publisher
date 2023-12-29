@@ -39,10 +39,10 @@ jobs:
             ./pyproject.toml => $TARGET_DIR
 
           last_ssh: |-
-            $VENV_BIN/pip install --no-cache-dir poetry pip setuptools --upgrade
-            $VENV_BIN/poetry config virtualenvs.create false --local
-            $VENV_BIN/poetry install --only main --no-root
-            $VENV_BIN/pip cache purge
+            source $VENV_BIN/activate 
+            pip install --no-cache-dir poetry pip setuptools --upgrade
+            poetry install --only main --no-root
+            pip cache purge
             echo 'DATABASE_USER=${{ secrets.DATABASE_USER_STAGE }}' > .env
             echo 'DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD_STAGE }}' >> .env
             echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME_STAGE }}' >> .env

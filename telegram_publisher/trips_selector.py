@@ -25,10 +25,8 @@ def get_weekend_range_in_local_tz() -> tuple[pendulum.DateTime, pendulum.DateTim
     return weekend_start_date.naive(), weekend_end_date.naive()
 
 
-def get_top_trips(top_n: int) -> Trips:
+def get_top_trips(top_n: int, weekend_range: tuple[pendulum.DateTime, pendulum.DateTime]) -> Trips:
     """Return TOP trips by cost grouped by destination."""
-    weekend_range = get_weekend_range_in_local_tz()
-
     trips = _fetch_trips(app_settings.LOCAL_AIRPORT_CODE, *weekend_range)
     logger.info('fetch {0} trips from db for {1} weekend'.format(len(trips), weekend_range))
 

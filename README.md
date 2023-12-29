@@ -16,7 +16,6 @@ $ cd telegram-publisher
 $ python3.12 -m venv venv
 $ source venv/bin/activate
 $ pip install -U poetry pip setuptools
-$ poetry config virtualenvs.create false --local
 $ poetry install
 ```
 
