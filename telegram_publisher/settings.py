@@ -19,6 +19,10 @@ APP_PATH = os.path.abspath(
 class AppSettings(BaseSettings, extra='ignore'):
     """Application settings class."""
 
+    assets_path: str = os.path.abspath(
+        os.path.join(APP_PATH, 'assets'),
+    )
+
     DEBUG: bool = Field(default=False)
     BOT_TOKEN: str
     PUBLISH_CHANNEL_ID: int = Field(default=-1002080937610)

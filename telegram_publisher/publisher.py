@@ -5,6 +5,7 @@ import logging
 
 import airportsdata
 import pendulum
+from aiogram import types
 from aiogram.utils import markdown
 
 from telegram_publisher.bot_setup import bot
@@ -45,7 +46,7 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     counter: int = 0
     messages = [
         markdown.markdown_decoration.quote(welcome_message),
-        markdown.markdown_decoration.quote('Cheap-trips are here!'),
+        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 ✈ ✨'),
         '',
     ]
 
@@ -77,10 +78,22 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
             messages.append('')
             counter += 1
 
+    messages.append(markdown.markdown_decoration.quote(
+        '''🌈 Have a great weekend! ☀ 💃
+        
+If there's anything wrong here, drop me a line and I'll fix it! 😉'''
+    ))
+
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
 
-    await bot.send_message(app_settings.PUBLISH_CHANNEL_ID, message)
+    message_pic = types.FSInputFile(f'{app_settings.assets_path}/default_1.png')
+
+    await bot.send_photo(
+        chat_id=app_settings.PUBLISH_CHANNEL_ID,
+        photo=message_pic,
+        caption=message,
+    )
     return counter
 
 
