@@ -69,19 +69,21 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
                 total_cost,
                 trip.currency.upper(),
             )))
-            messages.append(markdown.markdown_decoration.quote('-> {0}'.format(
-                pendulum.instance(trip.start_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('➡ {0}\n{1}'.format(
+                pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
+                trip.outbound_airline,
             )))
-            messages.append(markdown.markdown_decoration.quote('<- {0}'.format(
-                pendulum.instance(trip.end_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('⬅ {0}\n{1}'.format(
+                pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
+                trip.return_airline,
             )))
             messages.append('')
             counter += 1
 
     messages.append(markdown.markdown_decoration.quote(
-        '''🌈 Have a great weekend! ☀ 💃
-        
-If there's anything wrong here, drop me a line and I'll fix it! 😉'''
+        """🌈 Have a great weekend! ☀ 💃
+
+If there's anything wrong here, drop me a line and I'll fix it! 😉""",
     ))
 
     message = markdown.text(*messages, sep='\n')
