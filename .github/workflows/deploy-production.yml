@@ -33,7 +33,8 @@ jobs:
             touch .env
 
           scp: |-
-            './etc/*' => $TARGET_DIR/etc/
+            './etc/*' => $TARGET_DIR/etc/            
+            './assets/*' => $TARGET_DIR/assets/
             './telegram_publisher/*' => $TARGET_DIR/telegram_publisher/
             ./poetry.lock => $TARGET_DIR
             ./pyproject.toml => $TARGET_DIR

@@ -5,6 +5,7 @@ from decimal import Decimal
 import pendulum
 import pytest
 
+from telegram_publisher import bot_setup
 from telegram_publisher.models import Session, Trip
 
 
@@ -13,6 +14,12 @@ def event_loop():
     loop = asyncio.get_event_loop()
     yield loop
     loop.close()
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def close_aiohttp_session():
+    yield
+    await bot_setup.session.close()
 
 
 @pytest.fixture

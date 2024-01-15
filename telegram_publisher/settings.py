@@ -19,6 +19,10 @@ APP_PATH = os.path.abspath(
 class AppSettings(BaseSettings, extra='ignore'):
     """Application settings class."""
 
+    ASSETS_PATH: str = os.path.abspath(
+        os.path.join(APP_PATH, 'assets'),
+    )
+
     DEBUG: bool = Field(default=False)
     BOT_TOKEN: str
     PUBLISH_CHANNEL_ID: int = Field(default=-1002080937610)
@@ -29,7 +33,7 @@ class AppSettings(BaseSettings, extra='ignore'):
     DATABASE_HOST: str = Field(default='localhost')
     DATABASE_PORT: int = Field(default=5432)
 
-    TOP_N_TRIPS: int = Field(default=10)
+    TOP_N_TRIPS: int = Field(default=5)
     MINIMAL_OUTBOUND_FLY_HOUR: int = Field(default=19)
     MAXIMUM_RETURN_FLY_HOUR: int = Field(default=11)
     LOCAL_TIMEZONE: pendulum.Timezone = Field(default=pendulum.Timezone('Europe/Prague'))

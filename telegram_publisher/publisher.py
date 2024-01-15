@@ -2,12 +2,15 @@
 
 import asyncio
 import logging
+import os
+import random
 
 import airportsdata
 import pendulum
+from aiogram import types
 from aiogram.utils import markdown
 
-from telegram_publisher.bot_setup import bot
+from telegram_publisher import bot_setup
 from telegram_publisher.schemas import PublisherResponse, Trips, TripsGroup
 from telegram_publisher.settings import app_settings
 from telegram_publisher.trips_selector import get_top_trips, get_weekend_range_in_local_tz
@@ -24,18 +27,17 @@ async def main() -> PublisherResponse:
     trips: Trips = get_top_trips(app_settings.TOP_N_TRIPS, weekend_range)
     logger.info('fetch {0} trips'.format(trips))
 
-    if not trips.groups:
-        return PublisherResponse(
-            is_success=False,
-            trips_published=0,
-            date_range=weekend_range,
-        )
+    counter = 0
+    is_success = False
+    if trips.groups:
+        counter = await _publish(trips.groups)
+        is_success = True
+        logger.info('{0} trips published'.format(counter))
 
-    counter = await _publish(trips.groups)
-    logger.info('{0} trips published'.format(counter))
+    await bot_setup.session.close()
 
     return PublisherResponse(
-        is_success=True,
+        is_success=is_success,
         trips_published=counter,
         date_range=weekend_range,
     )
@@ -45,7 +47,7 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     counter: int = 0
     messages = [
         markdown.markdown_decoration.quote(welcome_message),
-        markdown.markdown_decoration.quote('Cheap-trips are here!'),
+        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 ✈ ✨'),
         '',
     ]
 
@@ -68,20 +70,60 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
                 total_cost,
                 trip.currency.upper(),
             )))
-            messages.append(markdown.markdown_decoration.quote('-> {0}'.format(
-                pendulum.instance(trip.start_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('➡ {0}\n{1}'.format(
+                pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
+                trip.outbound_airline,
             )))
-            messages.append(markdown.markdown_decoration.quote('<- {0}'.format(
-                pendulum.instance(trip.end_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('⬅ {0}\n{1}'.format(
+                pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
+                trip.return_airline,
             )))
             messages.append('')
             counter += 1
 
+    messages.append(
+        "{0}\n\nIf there's anything wrong here, {1} {2}".format(
+            markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
+            markdown.link('drop me', 'https://t.me/eira_tauraco'),
+            markdown.markdown_decoration.quote("a line and I'll fix it! 😉"),
+        ),
+    )
+
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
 
-    await bot.send_message(app_settings.PUBLISH_CHANNEL_ID, message)
+    await bot_setup.bot.send_photo(
+        chat_id=app_settings.PUBLISH_CHANNEL_ID,
+        photo=_choose_picture(trips[0].destination_code.upper()),
+        caption=message,
+    )
     return counter
+
+
+def _choose_picture(dst_airport: str) -> types.FSInputFile:
+    """Choose picture for the post according to the cheapest flight."""
+    all_pics = [
+        pic
+        for pic in os.listdir(app_settings.ASSETS_PATH)
+        if os.path.isfile(os.path.join(app_settings.ASSETS_PATH, pic))
+    ]
+
+    arr_airport_pics = [
+        pic
+        for pic in all_pics
+        if pic.startswith(dst_airport)
+    ]
+    default_pic = [
+        pic
+        for pic in all_pics
+        if pic.startswith('default')
+    ]
+
+    pic_name = random.choice(arr_airport_pics or default_pic)
+
+    return types.FSInputFile(
+        str(os.path.join(app_settings.ASSETS_PATH, pic_name)),
+    )
 
 
 if __name__ == '__main__':
