@@ -19,7 +19,7 @@ APP_PATH = os.path.abspath(
 class AppSettings(BaseSettings, extra='ignore'):
     """Application settings class."""
 
-    assets_path: str = os.path.abspath(
+    ASSETS_PATH: str = os.path.abspath(
         os.path.join(APP_PATH, 'assets'),
     )
 

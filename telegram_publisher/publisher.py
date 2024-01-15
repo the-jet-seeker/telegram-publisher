@@ -89,14 +89,17 @@ If there's anything wrong here, drop me a line and I'll fix it! 😉""",
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
 
-    message_pic = types.FSInputFile(f'{app_settings.assets_path}/default_1.png')
-
     await bot.send_photo(
         chat_id=app_settings.PUBLISH_CHANNEL_ID,
-        photo=message_pic,
+        photo=_choose_picture(),
         caption=message,
     )
     return counter
+
+
+def _choose_picture() -> types.FSInputFile:
+    """Choose picture for the post according to the cheapest flight."""
+    return types.FSInputFile(f'{app_settings.ASSETS_PATH}/default_1.png')
 
 
 if __name__ == '__main__':
