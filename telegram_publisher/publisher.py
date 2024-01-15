@@ -2,9 +2,12 @@
 
 import asyncio
 import logging
+import os
+import random
 
 import airportsdata
 import pendulum
+from aiogram import types
 from aiogram.utils import markdown
 
 from telegram_publisher.bot_setup import bot
@@ -45,7 +48,7 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     counter: int = 0
     messages = [
         markdown.markdown_decoration.quote(welcome_message),
-        markdown.markdown_decoration.quote('Cheap-trips are here!'),
+        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 ✈ ✨'),
         '',
     ]
 
@@ -68,20 +71,60 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
                 total_cost,
                 trip.currency.upper(),
             )))
-            messages.append(markdown.markdown_decoration.quote('-> {0}'.format(
-                pendulum.instance(trip.start_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('➡ {0}\n{1}'.format(
+                pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
+                trip.outbound_airline,
             )))
-            messages.append(markdown.markdown_decoration.quote('<- {0}'.format(
-                pendulum.instance(trip.end_date).to_day_datetime_string(),
+            messages.append(markdown.markdown_decoration.quote('⬅ {0}\n{1}'.format(
+                pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
+                trip.return_airline,
             )))
             messages.append('')
             counter += 1
 
+    messages.append(
+        "{0}\n\nIf there's anything wrong here, {1} {2}".format(
+            markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
+            markdown.link('drop me', 'https://t.me/eira_tauraco'),
+            markdown.markdown_decoration.quote("a line and I'll fix it! 😉"),
+        ),
+    )
+
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
 
-    await bot.send_message(app_settings.PUBLISH_CHANNEL_ID, message)
+    await bot.send_photo(
+        chat_id=app_settings.PUBLISH_CHANNEL_ID,
+        photo=_choose_picture(trips[0].destination_code.upper()),
+        caption=message,
+    )
     return counter
+
+
+def _choose_picture(dst_airport: str) -> types.FSInputFile:
+    """Choose picture for the post according to the cheapest flight."""
+    all_pics = [
+        pic
+        for pic in os.listdir(app_settings.ASSETS_PATH)
+        if os.path.isfile(os.path.join(app_settings.ASSETS_PATH, pic))
+    ]
+
+    arr_airport_pics = [
+        pic
+        for pic in all_pics
+        if pic.startswith(dst_airport)
+    ]
+    default_pic = [
+        pic
+        for pic in all_pics
+        if pic.startswith('default')
+    ]
+
+    pic_name = random.choice(arr_airport_pics or default_pic)
+
+    return types.FSInputFile(
+        str(os.path.join(app_settings.ASSETS_PATH, pic_name)),
+    )
 
 
 if __name__ == '__main__':

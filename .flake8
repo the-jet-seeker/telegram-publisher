@@ -21,12 +21,18 @@ ignore =
     # Found class without a base class - dataclass used
     WPS306,
 
+    # Standard pseudo-random generators are not suitable for security/cryptographic purposes
+    S311,
 
 per-file-ignores =
     # WPS115 Found upper-case constant in a class
     # WPS426 Found `lambda` in loop's body
     # WPS432 Found magic number
+    # WPS462 Wrong multiline string usage
 
     telegram_publisher/settings.py: WPS115, WPS432,
     telegram_publisher/models.py: WPS432,
     telegram_publisher/trips_selector.py: WPS426,
+    telegram_publisher/publisher.py: WPS462,
+
+
