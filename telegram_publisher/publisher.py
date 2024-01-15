@@ -82,12 +82,13 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
             messages.append('')
             counter += 1
 
-    messages.append(markdown.markdown_decoration.quote(
-        """🌈 Have a great weekend! ☀ 💃
-
-If there's anything wrong here, drop me a line and I'll fix it!
-@eira_tauraco 😉""",
-    ))
+    messages.append(
+        "{0}\n\nIf there's anything wrong here, {1} {2}".format(
+            markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
+            markdown.link('drop me', 'https://t.me/eira_tauraco'),
+            markdown.markdown_decoration.quote("a line and I'll fix it! 😉"),
+        ),
+    )
 
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
@@ -121,7 +122,9 @@ def _choose_picture(dst_airport: str) -> types.FSInputFile:
 
     pic_name = random.choice(arr_airport_pics or default_pic)
 
-    return types.FSInputFile(f'{app_settings.ASSETS_PATH}/{pic_name}')
+    return types.FSInputFile(
+        str(os.path.join(app_settings.ASSETS_PATH, pic_name)),
+    )
 
 
 if __name__ == '__main__':
