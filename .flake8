@@ -21,6 +21,8 @@ ignore =
     # Found class without a base class - dataclass used
     WPS306,
 
+    # Standard pseudo-random generators are not suitable for security/cryptographic purposes
+    S311,
 
 per-file-ignores =
     # WPS115 Found upper-case constant in a class

@@ -5,7 +5,7 @@ from telegram_publisher.schemas import TripsGroup
 
 async def test_publish_smoke(trip_first: Trip, trip_second: Trip):
     trips_group = TripsGroup(
-        destination_code='BCN',
+        destination_code='BOD',
         trips=[trip_first, trip_second],
     )
 

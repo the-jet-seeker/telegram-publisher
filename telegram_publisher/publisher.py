@@ -2,6 +2,8 @@
 
 import asyncio
 import logging
+import os
+import random
 
 import airportsdata
 import pendulum
@@ -83,7 +85,8 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     messages.append(markdown.markdown_decoration.quote(
         """🌈 Have a great weekend! ☀ 💃
 
-If there's anything wrong here, drop me a line and I'll fix it! 😉""",
+If there's anything wrong here, drop me a line and I'll fix it!
+@eira_tauraco 😉""",
     ))
 
     message = markdown.text(*messages, sep='\n')
@@ -91,15 +94,34 @@ If there's anything wrong here, drop me a line and I'll fix it! 😉""",
 
     await bot.send_photo(
         chat_id=app_settings.PUBLISH_CHANNEL_ID,
-        photo=_choose_picture(),
+        photo=_choose_picture(trips[0].destination_code.upper()),
         caption=message,
     )
     return counter
 
 
-def _choose_picture() -> types.FSInputFile:
+def _choose_picture(dst_airport: str) -> types.FSInputFile:
     """Choose picture for the post according to the cheapest flight."""
-    return types.FSInputFile(f'{app_settings.ASSETS_PATH}/default_1.png')
+    all_pics = [
+        pic
+        for pic in os.listdir(app_settings.ASSETS_PATH)
+        if os.path.isfile(os.path.join(app_settings.ASSETS_PATH, pic))
+    ]
+
+    arr_airport_pics = [
+        pic
+        for pic in all_pics
+        if pic.startswith(dst_airport)
+    ]
+    default_pic = [
+        pic
+        for pic in all_pics
+        if pic.startswith('default')
+    ]
+
+    pic_name = random.choice(arr_airport_pics or default_pic)
+
+    return types.FSInputFile(f'{app_settings.ASSETS_PATH}/{pic_name}')
 
 
 if __name__ == '__main__':
