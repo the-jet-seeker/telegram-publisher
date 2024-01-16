@@ -71,11 +71,11 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
                 total_cost,
                 trip.currency.upper(),
             )))
-            messages.append(markdown.markdown_decoration.quote('➡ {0} {1}'.format(
+            messages.append(markdown.markdown_decoration.quote('🛫 {0} {1}'.format(
                 pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
                 trip.outbound_airline,
             )))
-            messages.append(markdown.markdown_decoration.quote('⬅ {0} {1}'.format(
+            messages.append(markdown.markdown_decoration.quote('🛬 {0} {1}'.format(
                 pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
                 trip.return_airline,
             )))
