@@ -10,7 +10,7 @@ import pendulum
 from aiogram import types
 from aiogram.utils import markdown
 
-from telegram_publisher.bot_setup import bot
+from telegram_publisher import bot_setup
 from telegram_publisher.schemas import PublisherResponse, Trips, TripsGroup
 from telegram_publisher.settings import app_settings
 from telegram_publisher.trips_selector import get_top_trips, get_weekend_range_in_local_tz
@@ -27,18 +27,17 @@ async def main() -> PublisherResponse:
     trips: Trips = get_top_trips(app_settings.TOP_N_TRIPS, weekend_range)
     logger.info('fetch {0} trips'.format(trips))
 
-    if not trips.groups:
-        return PublisherResponse(
-            is_success=False,
-            trips_published=0,
-            date_range=weekend_range,
-        )
+    counter = 0
+    is_success = False
+    if trips.groups:
+        counter = await _publish(trips.groups)
+        is_success = True
+        logger.info('{0} trips published'.format(counter))
 
-    counter = await _publish(trips.groups)
-    logger.info('{0} trips published'.format(counter))
+    await bot_setup.session.close()
 
     return PublisherResponse(
-        is_success=True,
+        is_success=is_success,
         trips_published=counter,
         date_range=weekend_range,
     )
@@ -93,7 +92,7 @@ async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
     message = markdown.text(*messages, sep='\n')
     logger.info(f'publish message "{message}"')
 
-    await bot.send_photo(
+    await bot_setup.bot.send_photo(
         chat_id=app_settings.PUBLISH_CHANNEL_ID,
         photo=_choose_picture(trips[0].destination_code.upper()),
         caption=message,
