@@ -57,12 +57,36 @@ def trip_second() -> Trip:
 
             outbound_cost=Decimal(120),
             outbound_airport='PRG',
-            outbound_airline='TEST airlines',
+            outbound_airline='Ryanair',
             outbound_fly_number='TEST321',
 
             return_cost=Decimal(100),
             return_airport='BCN',
             return_airline='TEST airlines',
+            return_fly_number='TEST123',
+        )
+        session.add(trip)
+        session.commit()
+
+        yield trip
+
+        session.delete(trip)
+        session.commit()
+
+@pytest.fixture
+def trip_ryanair_both_ways() -> Trip:
+    with Session() as session:
+        trip = Trip(
+            start_date=pendulum.naive(2024, 3, 9, 4, 0, 0, 0),
+            end_date=pendulum.naive(2024, 3, 10, 12, 0, 0, 0),
+            currency='CZK',
+            outbound_cost=Decimal(120),
+            outbound_airport='PRG',
+            outbound_airline='Ryanair',
+            outbound_fly_number='TEST321',
+            return_cost=Decimal(100),
+            return_airport='BLQ',
+            return_airline='Ryanair',
             return_fly_number='TEST123',
         )
         session.add(trip)
