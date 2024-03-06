@@ -4,16 +4,14 @@ import asyncio
 import logging
 import os
 import random
-import urllib.parse
+from urllib.parse import urlencode
 
 import airportsdata
 import pendulum
 from aiogram import types
 from aiogram.utils import markdown
 
-from telegram_publisher import bot_setup
-from telegram_publisher.models import Trip
-from telegram_publisher.schemas import AirlineTicketUrl, PublisherResponse, Trips, TripsGroup
+from telegram_publisher import bot_setup, models, schemas
 from telegram_publisher.settings import app_settings
 from telegram_publisher.trips_selector import get_top_trips, get_weekend_range_in_local_tz
 
@@ -22,11 +20,11 @@ logger = logging.getLogger(__file__)
 airports = airportsdata.load('IATA')
 
 
-async def main() -> PublisherResponse:
+async def main() -> schemas.PublisherResponse:
     """Fetch trips and publish them to telegram channel."""
     weekend_range = get_weekend_range_in_local_tz()
 
-    trips: Trips = get_top_trips(app_settings.TOP_N_TRIPS, weekend_range)
+    trips: schemas.Trips = get_top_trips(app_settings.TOP_N_TRIPS, weekend_range)
     logger.info('fetch {0} trips'.format(trips))
 
     counter = 0
@@ -38,14 +36,14 @@ async def main() -> PublisherResponse:
 
     await bot_setup.session.close()
 
-    return PublisherResponse(
+    return schemas.PublisherResponse(
         is_success=is_success,
         trips_published=counter,
         date_range=weekend_range,
     )
 
 
-async def _publish(trips: list[TripsGroup], welcome_message: str = '') -> int:
+async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -> int:
     counter: int = 0
     messages = [
         markdown.markdown_decoration.quote(welcome_message),
@@ -128,53 +126,53 @@ def _choose_picture(dst_airport: str) -> types.FSInputFile:
     )
 
 
-def _airline_ticket_url(trip: Trip) -> AirlineTicketUrl:
+def _airline_ticket_url(trip: models.Trip) -> schemas.AirlineTicketUrl:
     """Create a link for the ticket at the airline page."""
     if trip.outbound_airline.lower() == 'ryanair':
-        outbound_query_params = urllib.parse.urlencode({
-            'adults': '1',
-            'teens': '0',
-            'children': '0',
-            'infants': '0',
+        outbound_query_params = urlencode({
+            'adults': 1,
+            'teens': 0,
+            'children': 0,
+            'infants': 0,
             'dateOut': trip.start_date.strftime('%Y-%m-%d'),
             'dateIn': '',
             'isConnectedFlight': 'false',
-            'discount': '0',
+            'discount': 0,
             'isReturn': 'false',
             'promoCode': '',
             'originIata': app_settings.LOCAL_AIRPORT_CODE,
             'destinationIata': trip.return_airport,
-            'tpAdults': '1',
-            'tpTeens': '0',
-            'tpChildren': '0',
-            'tpInfants': '0',
+            'tpAdults': 1,
+            'tpTeens': 0,
+            'tpChildren': 0,
+            'tpInfants': 0,
             'tpStartDate': trip.start_date.strftime('%Y-%m-%d'),
             'tpEndDate': '',
-            'tpDiscount': '0',
+            'tpDiscount': 0,
             'tpPromoCode': '',
             'tpOriginIata': app_settings.LOCAL_AIRPORT_CODE,
             'tpDestinationIata': trip.return_airport,
         })
-        inbound_query_params = urllib.parse.urlencode({
-            'adults': '1',
-            'teens': '0',
-            'children': '0',
-            'infants': '0',
+        inbound_query_params = urlencode({
+            'adults': 1,
+            'teens': 0,
+            'children': 0,
+            'infants': 0,
             'dateOut': trip.end_date.strftime('%Y-%m-%d'),
             'dateIn': '',
             'isConnectedFlight': 'false',
-            'discount': '0',
+            'discount': 0,
             'isReturn': 'false',
             'promoCode': '',
             'originIata': trip.return_airport,
             'destinationIata': app_settings.LOCAL_AIRPORT_CODE,
-            'tpAdults': '1',
-            'tpTeens': '0',
-            'tpChildren': '0',
-            'tpInfants': '0',
+            'tpAdults': 1,
+            'tpTeens': 0,
+            'tpChildren': 0,
+            'tpInfants': 0,
             'tpStartDate': trip.end_date.strftime('%Y-%m-%d'),
             'tpEndDate': '',
-            'tpDiscount': '0',
+            'tpDiscount': 0,
             'tpPromoCode': '',
             'tpOriginIata': trip.return_airport,
             'tpDestinationIata': app_settings.LOCAL_AIRPORT_CODE,
@@ -182,15 +180,15 @@ def _airline_ticket_url(trip: Trip) -> AirlineTicketUrl:
         outbound_url = 'https://www.ryanair.com/gb/en/trip/flights/select?{0}'.format(outbound_query_params)
         inbound_url = 'https://www.ryanair.com/gb/en/trip/flights/select?{0}'.format(inbound_query_params)
 
-        return AirlineTicketUrl(
+        return schemas.AirlineTicketUrl(
             outbound_ticket_link=markdown.link(trip.outbound_airline, outbound_url),
             inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
         )
-    else:
-        return AirlineTicketUrl(
-            outbound_ticket_link=trip.outbound_airline,
-            inbound_ticket_link=trip.return_airline,
-        )
+
+    return schemas.AirlineTicketUrl(
+        outbound_ticket_link=trip.outbound_airline,
+        inbound_ticket_link=trip.return_airline,
+    )
 
 
 if __name__ == '__main__':
