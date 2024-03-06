@@ -29,3 +29,11 @@ class Trips:
     """Possible trips result schema."""
 
     groups: list[TripsGroup]
+
+
+@dataclass
+class AirlineTicketUrl:
+    """Links for outbound and inbound tickets."""
+
+    outbound_ticket_link: str
+    inbound_ticket_link: str
