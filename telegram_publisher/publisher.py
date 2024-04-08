@@ -184,6 +184,37 @@ def _airline_ticket_url(trip: models.Trip) -> schemas.AirlineTicketUrl:
             outbound_ticket_link=markdown.link(trip.outbound_airline, outbound_url),
             inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
         )
+    elif trip.outbound_airline.lower() == 'easyjet':
+        outbound_query_params = urlencode({
+            'origins': app_settings.LOCAL_AIRPORT_CODE,
+            'destinations': f'{trip.return_airport}',
+            'departureDate': trip.start_date.strftime('%Y-%m-%d'),
+            'isOneWay': 'true',
+            'currency': 'CZK',
+            'residency': 'CZ',
+            'utm_source': 'easyjet_search_pod',
+            'adult': 16,
+            'partner': 'easyjet',
+        })
+        inbound_query_params = urlencode({
+            'origins': f'{trip.return_airport}',
+            'destinations': app_settings.LOCAL_AIRPORT_CODE,
+            'departureDate': trip.end_date.strftime('%Y-%m-%d'),  # а не будет ли тут проблемы если прилет заполночь?
+            'isOneWay': 'true',
+            'currency': 'CZK',
+            'residency': 'CZ',
+            'utm_source': 'easyjet_search_pod',
+            'adult': 16,
+            'partner': 'easyjet',
+        })
+
+        outbound_url = 'https://worldwide.easyjet.com/search?{0}'.format(outbound_query_params)
+        inbound_url = 'https://worldwide.easyjet.com/search?{0}'.format(inbound_query_params)
+
+        return schemas.AirlineTicketUrl(
+            outbound_ticket_link=markdown.link(trip.outbound_airline, outbound_url),
+            inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
+        )
 
     return schemas.AirlineTicketUrl(
         outbound_ticket_link=trip.outbound_airline,
