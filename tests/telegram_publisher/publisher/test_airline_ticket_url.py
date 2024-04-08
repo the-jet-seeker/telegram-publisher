@@ -19,6 +19,14 @@ def test_airline_ticket_url_easyjet_happy_path(trip_easyjet_both_ways: Trip):
     assert res.inbound_ticket_link == '[easyJet](https://worldwide.easyjet.com/search?origins=MXP&destinations=PRG&departureDate=2024-04-14&isOneWay=true&currency=CZK&residency=CZ&utm_source=easyjet_search_pod&adult=16&partner=easyjet)'
 
 
+def test_airline_ticket_url_wizzair_happy_path(trip_wizzair_both_ways: Trip):
+    res = _airline_ticket_url(trip_wizzair_both_ways)
+
+    assert isinstance(res, AirlineTicketUrl)
+    assert res.outbound_ticket_link == '[Wizz air](https://wizzair.com/en-gb/booking/select-flight/PRG/MXP/2024-04-13/null/1/0/0/null)'
+    assert res.inbound_ticket_link == '[Wizz air](https://wizzair.com/en-gb/booking/select-flight/MXP/PRG/2024-04-14/null/1/0/0/null)'
+
+
 def test_airline_ticket_url_other_airline(trip_first: Trip):
     res = _airline_ticket_url(trip_first)
 

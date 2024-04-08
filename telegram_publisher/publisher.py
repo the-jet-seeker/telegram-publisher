@@ -184,6 +184,23 @@ def _airline_ticket_url(trip: models.Trip) -> schemas.AirlineTicketUrl:
             outbound_ticket_link=markdown.link(trip.outbound_airline, outbound_url),
             inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
         )
+
+    elif trip.outbound_airline.lower() == 'wizz air':
+        outbound_url = 'https://wizzair.com/en-gb/booking/select-flight/{0}/{1}/{2}/null/1/0/0/null'.format(
+            app_settings.LOCAL_AIRPORT_CODE,
+            trip.return_airport,
+            trip.start_date.strftime('%Y-%m-%d'),
+        )
+        inbound_url = 'https://wizzair.com/en-gb/booking/select-flight/{0}/{1}/{2}/null/1/0/0/null'.format(
+            trip.return_airport,
+            app_settings.LOCAL_AIRPORT_CODE,
+            trip.end_date.strftime('%Y-%m-%d'),
+        )
+        return schemas.AirlineTicketUrl(
+            outbound_ticket_link=markdown.link(trip.outbound_airline, outbound_url),
+            inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
+        )
+
     elif trip.outbound_airline.lower() == 'easyjet':
         outbound_query_params = urlencode({
             'origins': app_settings.LOCAL_AIRPORT_CODE,
