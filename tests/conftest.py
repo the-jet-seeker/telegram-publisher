@@ -31,11 +31,11 @@ def trip_first() -> Trip:
             currency='CZK',
             outbound_cost=Decimal(120),
             outbound_airport='PRG',
-            outbound_airline='TEST airlines',
+            outbound_airline='Norvegian Air shuttle',
             outbound_fly_number='TEST321',
             return_cost=Decimal(100),
             return_airport='BCN',
-            return_airline='TEST airlines',
+            return_airline='Norvegian Air shuttle',
             return_fly_number='TEST123',
         )
         session.add(trip)

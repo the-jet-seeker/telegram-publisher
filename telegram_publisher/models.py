@@ -3,6 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 import sqlalchemy as sa
+from sqlalchemy import SMALLINT
 from sqlalchemy.dialects.postgresql import NUMERIC, TIMESTAMP
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
@@ -37,6 +38,10 @@ class Trip(Base):
     return_airport: Mapped[str] = mapped_column(sa.String(length=3))
     return_airline: Mapped[str] = mapped_column(sa.String)
     return_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
+
+    duration_in_days: Mapped[int] = mapped_column(SMALLINT, nullable=True, default=None)
+    rent_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2), nullable=True, default=None)
+    meal_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2), nullable=True, default=None)
 
 
 engine = sa.create_engine(

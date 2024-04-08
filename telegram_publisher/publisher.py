@@ -47,7 +47,7 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
     counter: int = 0
     messages = [
         markdown.markdown_decoration.quote(welcome_message),
-        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 ✈ ✨'),
+        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 🗺 ✈ ✨'),
         '',
     ]
 
@@ -66,7 +66,7 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
 
         for trip in trips_group.trips:
             total_cost = round(trip.outbound_cost + trip.return_cost)
-            messages.append(markdown.markdown_decoration.quote('{0} {1}'.format(
+            messages.append(markdown.bold('{0} {1}'.format(
                 total_cost,
                 trip.currency.upper(),
             )))
@@ -78,6 +78,16 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
                 pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
                 _airline_ticket_url(trip).inbound_ticket_link,
             ))
+            if trip.rent_cost:
+                messages.append(markdown.markdown_decoration.quote('approx cost for {0} day:'.format(
+                    trip.duration_in_days,  # todo ammount of days in the trip
+                )))
+                messages.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
+                    trip.rent_cost,  # todo cost of rent
+                    trip.currency.upper(),
+                    trip.meal_cost,  # todo cost of food
+                    trip.currency.upper(),
+                )))
             messages.append('')
             counter += 1
 
