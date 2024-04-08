@@ -146,3 +146,28 @@ def trip_wizzair_both_ways() -> Trip:
 
         session.delete(trip)
         session.commit()
+
+
+@pytest.fixture
+def trip_volotea_both_ways() -> Trip:
+    with Session() as session:
+        trip = Trip(
+            start_date=pendulum.naive(2024, 4, 13, 4, 0, 0, 0),
+            end_date=pendulum.naive(2024, 4, 14, 12, 0, 0, 0),
+            currency='CZK',
+            outbound_cost=Decimal(120),
+            outbound_airport='PRG',
+            outbound_airline='Volotea',
+            outbound_fly_number='TEST321',
+            return_cost=Decimal(100),
+            return_airport='MXP',
+            return_airline='Volotea',
+            return_fly_number='TEST123',
+        )
+        session.add(trip)
+        session.commit()
+
+        yield trip
+
+        session.delete(trip)
+        session.commit()

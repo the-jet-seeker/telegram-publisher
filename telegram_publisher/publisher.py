@@ -201,6 +201,13 @@ def _airline_ticket_url(trip: models.Trip) -> schemas.AirlineTicketUrl:
             inbound_ticket_link=markdown.link(trip.outbound_airline, inbound_url),
         )
 
+    elif trip.outbound_airline.lower() == 'volotea':
+        url = 'https://www.volotea.com/en/direct-flights/'
+        return schemas.AirlineTicketUrl(
+            outbound_ticket_link=markdown.link(trip.outbound_airline, url),
+            inbound_ticket_link=markdown.link(trip.outbound_airline, url),
+        )
+
     elif trip.outbound_airline.lower() == 'easyjet':
         outbound_query_params = urlencode({
             'origins': app_settings.LOCAL_AIRPORT_CODE,

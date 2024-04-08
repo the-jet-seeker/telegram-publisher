@@ -27,6 +27,14 @@ def test_airline_ticket_url_wizzair_happy_path(trip_wizzair_both_ways: Trip):
     assert res.inbound_ticket_link == '[Wizz air](https://wizzair.com/en-gb/booking/select-flight/MXP/PRG/2024-04-14/null/1/0/0/null)'
 
 
+def test_airline_ticket_url_volotea_happy_path(trip_volotea_both_ways: Trip):
+    res = _airline_ticket_url(trip_volotea_both_ways)
+
+    assert isinstance(res, AirlineTicketUrl)
+    assert res.outbound_ticket_link == '[Volotea](https://www.volotea.com/en/direct-flights/)'
+    assert res.inbound_ticket_link == '[Volotea](https://www.volotea.com/en/direct-flights/)'
+
+
 def test_airline_ticket_url_other_airline(trip_first: Trip):
     res = _airline_ticket_url(trip_first)
 
