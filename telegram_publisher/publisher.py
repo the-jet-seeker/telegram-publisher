@@ -80,12 +80,12 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
             ))
             if trip.rent_cost:
                 messages.append(markdown.markdown_decoration.quote('approx cost for {0} day:'.format(
-                    trip.duration_in_days,  # todo ammount of days in the trip
+                    trip.duration_in_days,
                 )))
                 messages.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
-                    trip.rent_cost,  # todo cost of rent
+                    trip.rent_cost,
                     trip.currency.upper(),
-                    trip.meal_cost,  # todo cost of food
+                    trip.meal_cost,
                     trip.currency.upper(),
                 )))
             messages.append('')
