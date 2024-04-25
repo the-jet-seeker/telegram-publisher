@@ -79,13 +79,13 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
                 _airline_ticket_url(trip).inbound_ticket_link,
             ))
             if trip.rent_cost:
-                messages.append(markdown.markdown_decoration.quote('approx cost for {0} day:'.format(
-                    trip.duration_in_days,
+                messages.append(markdown.markdown_decoration.quote('approx cost for {0} day(s):'.format(
+                    trip.duration_nights,
                 )))
                 messages.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
-                    trip.rent_cost,
+                    round(trip.rent_cost * trip.duration_nights),  # todo test
                     trip.currency.upper(),
-                    trip.meal_cost,
+                    round(trip.meal_cost * trip.meals_amount),  # todo test
                     trip.currency.upper(),
                 )))
             messages.append('')

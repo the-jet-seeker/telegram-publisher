@@ -39,7 +39,8 @@ class Trip(Base):
     return_airline: Mapped[str] = mapped_column(sa.String)
     return_fly_number: Mapped[str] = mapped_column(sa.String(length=16))
 
-    duration_in_days: Mapped[int] = mapped_column(SMALLINT, nullable=True, default=None)
+    duration_nights: Mapped[int] = mapped_column(SMALLINT, nullable=True, default=None)
+    meals_amount: Mapped[int] = mapped_column(SMALLINT, nullable=True, default=None)
     rent_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2), nullable=True, default=None)
     meal_cost: Mapped[Decimal] = mapped_column(NUMERIC(precision=20, scale=2), nullable=True, default=None)
 
