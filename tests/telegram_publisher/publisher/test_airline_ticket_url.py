@@ -38,5 +38,5 @@ def test_airline_ticket_url_volotea_happy_path(trip_volotea_both_ways: Trip):
 def test_airline_ticket_url_other_airline(trip_first: Trip):
     res = _airline_ticket_url(trip_first)
 
-    assert res.outbound_ticket_link == 'TEST airlines'
-    assert res.inbound_ticket_link == 'TEST airlines'
+    assert res.outbound_ticket_link == 'Norvegian Air shuttle'
+    assert res.inbound_ticket_link == 'Norvegian Air shuttle'

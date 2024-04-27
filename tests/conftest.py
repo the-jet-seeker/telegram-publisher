@@ -29,14 +29,21 @@ def trip_first() -> Trip:
             start_date=pendulum.naive(2023, 1, 1, 4, 0, 0, 0),
             end_date=pendulum.naive(2023, 1, 2, 12, 0, 0, 0),
             currency='CZK',
+
             outbound_cost=Decimal(120),
             outbound_airport='PRG',
-            outbound_airline='TEST airlines',
+            outbound_airline='Norvegian Air shuttle',
             outbound_fly_number='TEST321',
+
             return_cost=Decimal(100),
             return_airport='BCN',
-            return_airline='TEST airlines',
+            return_airline='Norvegian Air shuttle',
             return_fly_number='TEST123',
+
+            duration_nights=1,
+            meals_amount=5,
+            rent_cost=3135,
+            meal_cost=380,
         )
         session.add(trip)
         session.commit()
@@ -64,6 +71,11 @@ def trip_second() -> Trip:
             return_airport='BCN',
             return_airline='TEST airlines',
             return_fly_number='TEST123',
+
+            duration_nights=1,
+            meals_amount=5,
+            rent_cost=3135,
+            meal_cost=380,
         )
         session.add(trip)
         session.commit()
@@ -88,6 +100,11 @@ def trip_ryanair_both_ways() -> Trip:
             return_airport='BLQ',
             return_airline='Ryanair',
             return_fly_number='TEST123',
+
+            duration_nights=1,
+            meals_amount=5,
+            rent_cost=2486,
+            meal_cost=506,
         )
         session.add(trip)
         session.commit()
@@ -113,6 +130,11 @@ def trip_easyjet_both_ways() -> Trip:
             return_airport='MXP',
             return_airline='easyJet',
             return_fly_number='TEST123',
+
+            duration_nights=2,
+            meals_amount=9,
+            rent_cost=3623,
+            meal_cost=506,
         )
         session.add(trip)
         session.commit()
