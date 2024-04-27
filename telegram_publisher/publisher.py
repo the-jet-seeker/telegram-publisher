@@ -65,30 +65,8 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
         )))
 
         for trip in trips_group.trips:
-            total_cost = round(trip.outbound_cost + trip.return_cost)
-            messages.append(markdown.bold('{0} {1}'.format(
-                total_cost,
-                trip.currency.upper(),
-            )))
-            messages.append('🛫 {0} {1}'.format(
-                pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
-                _airline_ticket_url(trip).outbound_ticket_link,
-            ))
-            messages.append('🛬 {0} {1}'.format(
-                pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
-                _airline_ticket_url(trip).inbound_ticket_link,
-            ))
-            if trip.rent_cost:
-                messages.append(markdown.markdown_decoration.quote('approx cost for {0} day(s):'.format(
-                    trip.duration_nights,
-                )))
-                messages.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
-                    round(trip.rent_cost * trip.duration_nights),  # todo test
-                    trip.currency.upper(),
-                    round(trip.meal_cost * trip.meals_amount),  # todo test
-                    trip.currency.upper(),
-                )))
-            messages.append('')
+            messages += _trip_description(trip)
+
             counter += 1
 
     messages.append(
@@ -108,6 +86,41 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
         caption=message,
     )
     return counter
+
+
+def _trip_description(trip: models.Trip) -> list[str]:
+    """Return a part of the message with one trip."""
+    total_cost = round(trip.outbound_cost + trip.return_cost)
+
+    trip_description = [
+        markdown.bold('{0} {1}'.format(
+            total_cost,
+            trip.currency.upper(),
+        )),
+        '🛫 {0} {1}'.format(
+            pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
+            _airline_ticket_url(trip).outbound_ticket_link,
+        ),
+        '🛬 {0} {1}'.format(
+            pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
+            _airline_ticket_url(trip).inbound_ticket_link,
+        ),
+    ]
+
+    if trip.rent_cost:
+        trip_description.append(markdown.markdown_decoration.quote('approx cost for {0} day(s):'.format(
+            trip.duration_nights,
+        )))
+        trip_description.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
+            round(trip.rent_cost * trip.duration_nights),
+            trip.currency.upper(),
+            round(trip.meal_cost * trip.meals_amount),
+            trip.currency.upper(),
+        )))
+
+    trip_description.append('')
+
+    return trip_description
 
 
 def _choose_picture(dst_airport: str) -> types.FSInputFile:
