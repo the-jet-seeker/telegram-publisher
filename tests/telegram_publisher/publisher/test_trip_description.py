@@ -6,10 +6,10 @@ def test_trip_description(trip_first: Trip):
     res = _trip_description(trip_first)
 
     assert res == [
-        '*220 CZK*',
+        '*220 Kč*',
         '🛫 Sun, Jan 1, 04:00 AM Norvegian Air shuttle',
         '🛬 Mon, Jan 2, 12:00 PM Norvegian Air shuttle',
         'approx cost for 1 day\\(s\\):',
-        '🏠 3100 CZK   ☕️ 1900 CZK',
+        '🏠 3100 Kč   ☕️ 1900 Kč',
         '',
     ]
