@@ -88,14 +88,23 @@ async def _publish(trips: list[schemas.TripsGroup], welcome_message: str = '') -
     return counter
 
 
+def _transform_currency_code(currency: str) -> str:
+    """Get currency code from the trip, Return it in the human-readable view."""
+    if currency.lower() == 'czk':
+        return 'Kč'
+
+    raise RuntimeError("Let's make currency human-readable.")
+
+
 def _trip_description(trip: models.Trip) -> list[str]:
     """Return a part of the message with one trip."""
     total_cost = round(trip.outbound_cost + trip.return_cost)
+    currency = _transform_currency_code(trip.currency)
 
     trip_description = [
         markdown.bold('{0} {1}'.format(
             total_cost,
-            trip.currency.upper(),
+            currency,
         )),
         '🛫 {0} {1}'.format(
             pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
@@ -113,9 +122,9 @@ def _trip_description(trip: models.Trip) -> list[str]:
         )))
         trip_description.append(markdown.markdown_decoration.quote('🏠 {0} {1}   ☕️ {2} {3}'.format(
             round(trip.rent_cost * trip.duration_nights),
-            trip.currency.upper(),
+            currency,
             round(trip.meal_cost * trip.meals_amount),
-            trip.currency.upper(),
+            currency,
         )))
 
     trip_description.append('')
