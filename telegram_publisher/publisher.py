@@ -107,11 +107,11 @@ def _trip_description(trip: models.Trip) -> list[str]:
             currency,
         )),
         '🛫 {0} {1}'.format(
-            pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm A'),
+            pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm'),
             _airline_ticket_url(trip).outbound_ticket_link,
         ),
         '🛬 {0} {1}'.format(
-            pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm A'),
+            pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm'),
             _airline_ticket_url(trip).inbound_ticket_link,
         ),
     ]
