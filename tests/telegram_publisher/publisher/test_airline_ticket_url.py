@@ -1,5 +1,5 @@
 from telegram_publisher.models import Trip
-from telegram_publisher.publisher import _airline_ticket_url
+from telegram_publisher.message_presenter import _airline_ticket_url
 from telegram_publisher.schemas import AirlineTicketUrl
 
 

@@ -34,6 +34,7 @@ per-file-ignores =
     telegram_publisher/settings.py: WPS115, WPS432,
     telegram_publisher/models.py: WPS432,
     telegram_publisher/trips_selector.py: WPS426,
-    telegram_publisher/publisher.py: WPS462, WPS226
+    telegram_publisher/publisher.py: WPS462
+    telegram_publisher/message_presenter.py: WPS226
 
 
