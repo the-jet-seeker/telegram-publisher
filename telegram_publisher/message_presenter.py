@@ -34,8 +34,9 @@ def message_presenter(trips: list[schemas.TripsGroup]) -> tuple[str, int]:
             trips_group.destination_code,
         )
         destination_country = pycountry.countries.get(alpha_2=destination_country_code)
-        messages.append(markdown.bold('{0}'.format(
+        messages.append(markdown.bold('{0} {1}'.format(
             destination_country.name,
+            destination_country.flag,
         )))
         messages.append(markdown.markdown_decoration.quote('{0} ({1})'.format(
             destination.get(
@@ -51,11 +52,7 @@ def message_presenter(trips: list[schemas.TripsGroup]) -> tuple[str, int]:
             counter += 1
 
     messages.append(
-        "{0}\n\nIf there's anything wrong here, {1} {2}".format(
-            markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
-            markdown.link('drop me', 'https://t.me/eira_tauraco'),
-            markdown.markdown_decoration.quote("a line and I'll fix it! 😉"),
-        ),
+        markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
     )
 
     return (
@@ -82,11 +79,11 @@ def _trip_description(trip: models.Trip) -> list[str]:
             total_cost,
             currency,
         )),
-        '🛫 {0} {1}'.format(
+        '► {0} {1}'.format(
             pendulum.instance(trip.start_date).format('ddd, MMM D, HH:mm'),
             _airline_ticket_url(trip).outbound_ticket_link,
         ),
-        '🛬 {0} {1}'.format(
+        '◄ {0} {1}'.format(
             pendulum.instance(trip.end_date).format('ddd, MMM D, HH:mm'),
             _airline_ticket_url(trip).inbound_ticket_link,
         ),
