@@ -1,6 +1,6 @@
 import pytest
 
-from telegram_publisher.publisher import _transform_currency_code
+from telegram_publisher.message_presenter import _transform_currency_code
 
 
 def test_transform_currency_code_happy_path():

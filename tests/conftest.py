@@ -85,6 +85,7 @@ def trip_second() -> Trip:
         session.delete(trip)
         session.commit()
 
+
 @pytest.fixture
 def trip_ryanair_both_ways() -> Trip:
     with Session() as session:

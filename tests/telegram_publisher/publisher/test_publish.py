@@ -9,6 +9,6 @@ async def test_publish_smoke(trip_first: Trip, trip_second: Trip):
         trips=[trip_first, trip_second],
     )
 
-    res = await _publish([trips_group], 'Publisher unittests')
+    res = await _publish([trips_group])
 
     assert res == 2
