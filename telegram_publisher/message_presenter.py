@@ -15,12 +15,20 @@ logger = logging.getLogger(__file__)
 airports = airportsdata.load('IATA')
 
 
-def message_presenter(trips: list[schemas.TripsGroup]) -> tuple[str, int]:
+def message_presenter(
+    trips: list[schemas.TripsGroup],
+    weekend_range: tuple[pendulum.DateTime, pendulum.DateTime],
+) -> tuple[str, int]:
     """Create the text for trips post."""
     # todo test
     counter: int = 0
     messages = [
-        markdown.markdown_decoration.quote('Here are your trip ideas for next weekend! 😎 🗺 ✈ ✨'),
+        markdown.markdown_decoration.quote(
+            '{0} - {1} ✈ weekend trips:'.format(
+                pendulum.instance(weekend_range[0]).format('D MMM'),
+                pendulum.instance(weekend_range[1]).format('D MMM'),
+            ),
+        ),
         '',
     ]
 
@@ -52,7 +60,7 @@ def message_presenter(trips: list[schemas.TripsGroup]) -> tuple[str, int]:
             counter += 1
 
     messages.append(
-        markdown.markdown_decoration.quote('🌈 Have a great weekend! ☀ 💃'),
+        markdown.markdown_decoration.quote('Have a great weekend! ☀ 💃'),
     )
 
     return (
