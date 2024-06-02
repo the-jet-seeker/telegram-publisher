@@ -5,6 +5,7 @@ import logging
 import os
 import random
 
+import pendulum
 from aiogram import types
 
 from telegram_publisher import bot_setup, schemas
@@ -25,7 +26,7 @@ async def main() -> schemas.PublisherResponse:
     counter = 0
     is_success = False
     if trips.groups:
-        counter = await _publish(trips.groups)
+        counter = await _publish(trips.groups, weekend_range)
         is_success = True
         logger.info('{0} trips published'.format(counter))
 
@@ -38,9 +39,12 @@ async def main() -> schemas.PublisherResponse:
     )
 
 
-async def _publish(trips: list[schemas.TripsGroup]) -> int:
+async def _publish(
+    trips: list[schemas.TripsGroup],
+    weekend_range: tuple[pendulum.DateTime, pendulum.DateTime],
+) -> int:
     """Publish a messages to the channel. Return amount of trips."""
-    message, counter = message_presenter(trips)
+    message, counter = message_presenter(trips, weekend_range)
 
     logger.info(f'publish message "{message}"')
 
