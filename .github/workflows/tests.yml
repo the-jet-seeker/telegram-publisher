@@ -9,6 +9,21 @@ jobs:
       matrix:
         python-version: ['3.12']
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: tjs
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - uses: actions/checkout@v2
 
@@ -23,13 +38,16 @@ jobs:
         poetry --version
         poetry install
 
+    - name: Import DB seed data
+      run: |
+        psql -d postgresql://postgres:postgres@localhost/tjs -f fixture.sql
+      working-directory: ./etc
+
     - name: Run tests
       env:
-        DATABASE_USER: ${{ secrets.DATABASE_USER_STAGE }}
-        DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD_STAGE }}
-        DATABASE_NAME: ${{ secrets.DATABASE_NAME_STAGE }}
-        DATABASE_HOST: ${{ secrets.DATABASE_HOST_STAGE }}
-        DATABASE_PORT: ${{ secrets.DATABASE_PORT_STAGE }}
+        DATABASE_USER: 'postgres'
+        DATABASE_PASSWORD: 'postgres'
+        DATABASE_NAME: 'tjs'
         BOT_TOKEN: ${{ secrets.BOT_TOKEN_STAGE }}
       run: |
         poetry run pytest tests --cov=telegram_publisher
